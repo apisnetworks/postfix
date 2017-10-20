@@ -1,0 +1,25 @@
+--- postfix-3.2.3-orig/conf/postfix-files       2016-02-06 15:34:18.000000000 -0500
++++ postfix-3.2.3/conf/postfix-files    2017-10-20 12:41:43.239773165 -0400
+@@ -164,8 +164,8 @@
+ $config_directory/postfix-script-sgid:f:root:-:755:o
+ $config_directory/postfix-script-nosgid:f:root:-:755:o
+ $config_directory/post-install:f:root:-:755:o
+-$manpage_directory/man1/mailq.1:f:root:-:644
+-$manpage_directory/man1/newaliases.1:f:root:-:644
++$manpage_directory/man1/mailq.postfix.1:f:root:-:644
++$manpage_directory/man1/newaliases.postfix.1:f:root:-:644
+ $manpage_directory/man1/postalias.1:f:root:-:644
+ $manpage_directory/man1/postcat.1:f:root:-:644
+ $manpage_directory/man1/postconf.1:f:root:-:644
+@@ -179,9 +179,9 @@
+ $manpage_directory/man1/postmulti.1:f:root:-:644
+ $manpage_directory/man1/postqueue.1:f:root:-:644
+ $manpage_directory/man1/postsuper.1:f:root:-:644
+-$manpage_directory/man1/sendmail.1:f:root:-:644
++$manpage_directory/man1/sendmail.postfix.1:f:root:-:644
+ $manpage_directory/man5/access.5:f:root:-:644
+-$manpage_directory/man5/aliases.5:f:root:-:644
++$manpage_directory/man5/aliases.postfix.5:f:root:-:644
+ $manpage_directory/man5/body_checks.5:f:root:-:644
+ $manpage_directory/man5/bounce.5:f:root:-:644
+ $manpage_directory/man5/canonical.5:f:root:-:644
