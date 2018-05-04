@@ -43,6 +43,7 @@
 
 Name: postfix
 Summary: Postfix Mail Transport Agent
+Epoch: 3
 Version: 3.2.5
 Release: 1%{?dist}
 Group: System Environment/Daemons
@@ -531,11 +532,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
-* Fri May 4 2018 Matt Saladna <matt@apisnetworks.com> - 3.2.5-1.apnscp
+* Fri May 4 2018 Matt Saladna <matt@apisnetworks.com> - 3:3.2.5-1.apnscp
 - Bump to 3.2.5
 - Replace master.cf 
 
-* Fri Oct 20 2017 Matt Saladna <matt@apisnetworks.com> - 3.2.3-1.apnscp
+* Fri Oct 20 2017 Matt Saladna <matt@apisnetworks.com> - 3:3.2.3-1.apnscp
 - Drop large-fs patch. Platform uses Maildir.
 - Remove Cyrus SASL, "mysql" map support
 
