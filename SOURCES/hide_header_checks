@@ -1,0 +1,1 @@
+/^Received: (.*) (ESMTPSA id .+)/ REPLACE Received: from [10.0.0.4] by mx-relay (Postfix) with $2

@@ -1,8 +1,8 @@
 %bcond_with mysql
 # Dovecot SASL used instead
 %bcond_with sasl
+%bcond_with ldap
 %bcond_without pgsql
-%bcond_without ldap
 %bcond_without pcre
 %bcond_without tls
 %bcond_without ipv6
@@ -43,9 +43,8 @@
 
 Name: postfix
 Summary: Postfix Mail Transport Agent
-Version: 3.2.3
-Release: 1.apnscp%{?dist}
-Epoch: 0
+Version: 3.2.5
+Release: 1%{?dist}
 Group: System Environment/Daemons
 URL: http://www.postfix.org
 License: IBM and GPLv2+
@@ -57,6 +56,7 @@ Requires(preun): %{_sbindir}/alternatives
 Requires(preun): systemd
 Requires(postun): systemd
 Provides: MTA smtpd smtpdaemon server(smtp)
+Provides: postfix = %{version}
 
 Source0: ftp://ftp.porcupine.org/mirrors/postfix-release/official/%{name}-%{version}.tar.gz
 Source1: postfix-etc-init.d-postfix
@@ -78,12 +78,13 @@ Source53: http://jimsun.linxnet.com/downloads/pflogsumm-%{pflogsumm_ver}.tar.gz
 
 Source100: postfix-sasl.conf
 Source101: postfix-pam.conf
-
+Source102: hide_header_checks
 # Patches
 
 Patch2: postfix-3.2.3-files.patch
 Patch3: postfix-alternatives.patch
 Patch9: pflogsumm-1.1.3-datecalc.patch
+Patch10: mastercf-apnscp.patch
 
 # Optional patches - set the appropriate environment variables to include
 #		     them when building the package/spec file
@@ -119,12 +120,9 @@ This package contains the SysV initscript.
 %package perl-scripts
 Summary: Postfix utilities written in perl
 Group: Applications/System
-Requires: %{name} = %{epoch}:%{version}-%{release}
-# perl-scripts introduced in 2:2.5.5-2
-Obsoletes: postfix < 2:2.5.5-2
+Requires: %{name} = %{version}-%{release}
 %if %{with pflogsumm}
 Provides: postfix-pflogsumm = %{epoch}:%{version}-%{release}
-Obsoletes: postfix-pflogsumm < 2:2.5.5-2
 %endif
 %description perl-scripts
 This package contains perl scripts pflogsumm and qshape.
@@ -149,6 +147,7 @@ pushd pflogsumm-%{pflogsumm_ver}
 %patch9 -p1 -b .datecalc
 popd
 %endif
+%patch10 -p1 -b .apnscp
 
 for f in README_FILES/TLS_{LEGACY_,}README TLS_ACKNOWLEDGEMENTS; do
 	iconv -f iso8859-1 -t utf8 -o ${f}{_,} &&
@@ -319,6 +318,8 @@ do
 	touch $RPM_BUILD_ROOT$i
 done
 
+install -m 644 %{SOURCE102} %{buildroot}%{postfix_config_dir}/hide_header_checks
+
 %post
 %systemd_post %{name}.service
 
@@ -471,6 +472,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %config(noreplace) %{postfix_config_dir}/canonical
 %attr(0644, root, root) %config(noreplace) %{postfix_config_dir}/generic
 %attr(0644, root, root) %config(noreplace) %{postfix_config_dir}/header_checks
+%attr(0644, root, root) %config(noreplace) %{postfix_config_dir}/hide_header_checks
 %attr(0644, root, root) %config(noreplace) %{postfix_config_dir}/main.cf
 %attr(0644, root, root) %config(noreplace) %{postfix_config_dir}/master.cf
 %attr(0644, root, root) %config(noreplace) %{postfix_config_dir}/relocated
@@ -529,7 +531,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
-* Fri Oct 20 2017 Matt Saladna <matt@apisnetworks.com> - 2:3.2.3-1.apnscp
+* Fri May 4 2018 Matt Saladna <matt@apisnetworks.com> - 3.2.5-1.apnscp
+- Bump to 3.2.5
+- Replace master.cf 
+
+* Fri Oct 20 2017 Matt Saladna <matt@apisnetworks.com> - 3.2.3-1.apnscp
 - Drop large-fs patch. Platform uses Maildir.
 - Remove Cyrus SASL, "mysql" map support
 
