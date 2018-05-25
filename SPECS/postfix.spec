@@ -184,6 +184,7 @@ CCARGS="${CCARGS} -fsigned-char"
   AUXLIBS="${AUXLIBS} -L%{_libdir}/sasl2 -lsasl2"
   %global sasl_config_dir %{_sysconfdir}/sasl2
 %endif
+CCARGS="${CCARGS} -DUSE_SASL_AUTH -DDEF_SERVER_SASL_TYPE=\\\"dovecot\\\""
 %if %{with tls}
   if pkg-config openssl ; then
     CCARGS="${CCARGS} -DUSE_TLS `pkg-config --cflags openssl`"
