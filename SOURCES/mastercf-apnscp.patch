@@ -83,15 +83,18 @@ diff -Nur postfix-3.2.5-orig/conf/master.cf postfix-3.2.5/conf/master.cf
  #
  # ====================================================================
  # Interfaces to non-Postfix software. Be sure to examine the manual
-@@ -76,8 +72,9 @@
+@@ -76,8 +72,12 @@
  # maildrop. See the Postfix MAILDROP_README file for details.
  # Also specify in main.cf: maildrop_destination_recipient_limit=1
  #
 -#maildrop  unix  -       n       n       -       -       pipe
 -#  flags=DRhu user=vmail argv=/usr/local/bin/maildrop -d ${recipient}
-+maildrop  unix  -       n       n       -       20       pipe
++vmaildrop  unix  -       n       n       -       20       pipe
 +	flags=XODRhu user=mail argv=/usr/bin/maildrop
 + 	-d ${user}@${nexthop} ${extension} ${recipient} ${user} ${nexthop}   
++localmaildrop  unix  -       n       n       -       20       pipe
++	flags=XODRhu user=mail argv=/usr/bin/maildrop
++ 	-d ${user} ${extension} ${recipient} ${user} ${nexthop}   
  #
  # ====================================================================
  #
