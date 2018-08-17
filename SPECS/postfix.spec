@@ -1,6 +1,6 @@
 %bcond_with mysql
 # Dovecot SASL used instead
-%bcond_with sasl
+%bcond_without sasl
 %bcond_with ldap
 %bcond_without pgsql
 %bcond_without pcre
@@ -44,7 +44,7 @@
 Name: postfix
 Summary: Postfix Mail Transport Agent
 Epoch: 3
-Version: 3.2.5
+Version: 3.2.6
 Release: 1%{?dist}
 Group: System Environment/Daemons
 URL: http://www.postfix.org
@@ -533,6 +533,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Fri Aug 17 2018 Matt Saladna <matt@apisnetworks.com> - 3:3.2.6-1.apnscp
+- Bump to 3.2.6
+- Enable Cyrus SASL for forwarding servers
+
 * Fri May 4 2018 Matt Saladna <matt@apisnetworks.com> - 3:3.2.5-1.apnscp
 - Bump to 3.2.5
 - Replace master.cf 
