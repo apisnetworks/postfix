@@ -44,7 +44,7 @@
 Name: postfix
 Summary: Postfix Mail Transport Agent
 Epoch: 3
-Version: 3.2.6
+Version: 3.3.4
 Release: 1%{?dist}
 Group: System Environment/Daemons
 URL: http://www.postfix.org
@@ -206,7 +206,7 @@ AUXLIBS="${AUXLIBS} %{?harden:%{harden}}"
 make -f Makefile.init makefiles CCARGS="${CCARGS}" AUXLIBS="${AUXLIBS}" \
   DEBUG="" OPT="$RPM_OPT_FLAGS -fno-strict-aliasing -Wno-comment"
 
-make %{?_smp_mflags} 
+make %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -312,9 +312,9 @@ popd
 mkdir -p $RPM_BUILD_ROOT%{_var}/lib/misc
 touch $RPM_BUILD_ROOT%{_var}/lib/misc/postfix.aliasesdb-stamp
 
-# prepare alternatives ghosts 
+# prepare alternatives ghosts
 for i in %{postfix_command_dir}/sendmail %{_bindir}/{mailq,newaliases,rmail} \
-	%{_sysconfdir}/pam.d/smtp /usr/lib/sendmail \
+	/usr/lib/sendmail \
 	%{_mandir}/{man1/{mailq.1,newaliases.1},man5/aliases.5,man8/sendmail.8}
 do
 	touch $RPM_BUILD_ROOT$i
@@ -338,7 +338,6 @@ install -m 644 %{SOURCE102} %{buildroot}%{postfix_config_dir}/hide_header_checks
 %{_sbindir}/alternatives --install %{postfix_command_dir}/sendmail mta %{postfix_command_dir}/sendmail.postfix 30 \
 	--slave %{_bindir}/mailq mta-mailq %{_bindir}/mailq.postfix \
 	--slave %{_bindir}/newaliases mta-newaliases %{_bindir}/newaliases.postfix \
-	--slave %{_sysconfdir}/pam.d/smtp mta-pam %{_sysconfdir}/pam.d/smtp.postfix \
 	--slave %{_bindir}/rmail mta-rmail %{_bindir}/rmail.postfix \
 	--slave /usr/lib/sendmail mta-sendmail /usr/lib/sendmail.postfix \
 	--slave %{_mandir}/man1/mailq.1.gz mta-mailqman %{_mandir}/man1/mailq.postfix.1.gz \
@@ -533,13 +532,17 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Apr 01 2019 Matt Saladna <matt@apisnetworks.com> - 3:3.3.4-1.apnscp
+- Bump to 3.3.4
+- Remove PAM alternatives usage
+
 * Fri Aug 17 2018 Matt Saladna <matt@apisnetworks.com> - 3:3.2.6-1.apnscp
 - Bump to 3.2.6
 - Enable Cyrus SASL for forwarding servers
 
 * Fri May 4 2018 Matt Saladna <matt@apisnetworks.com> - 3:3.2.5-1.apnscp
 - Bump to 3.2.5
-- Replace master.cf 
+- Replace master.cf
 
 * Fri Oct 20 2017 Matt Saladna <matt@apisnetworks.com> - 3:3.2.3-1.apnscp
 - Drop large-fs patch. Platform uses Maildir.
@@ -925,7 +928,7 @@ rm -rf $RPM_BUILD_ROOT
 
 * Fri Mar 11 2005 Thomas Woerner <twoerner@redhat.com> 2:2.2.0-1
 - new version 2.2.0
-- cleanup of spec file: removed external TLS and IPV6 patches, removed 
+- cleanup of spec file: removed external TLS and IPV6 patches, removed
   smtp_sasl_proto patch
 - dropped samples directory till there are good examples again (was TLS and
   IPV6)
@@ -1018,10 +1021,10 @@ rm -rf $RPM_BUILD_ROOT
   for RHEL3, we'll branch and set set sasl to v1 and turn off ipv6
 
 * Tue Feb 17 2004 John Dennis <jdennis@porkchop.devel.redhat.com>
-- revert back to v1 of sasl because LDAP still links against v1 and we can't 
+- revert back to v1 of sasl because LDAP still links against v1 and we can't
 - bump revision for build
   have two different versions of the sasl library loaded in one load image at
-  the same time. How is that possible? Because the sasl libraries have different 
+  the same time. How is that possible? Because the sasl libraries have different
   names (libsasl.so & libsasl2.so) but export the same symbols :-(
   Fixes bugs 115249 and 111767
 
@@ -1050,7 +1053,7 @@ rm -rf $RPM_BUILD_ROOT
 
 * Sat Dec 13 2003 Jeff Johnson <jbj@jbj.org> 2:2.0.16-2
 - rebuild against db-4.2.52.
- 
+
 * Mon Nov 17 2003 John Dennis <jdennis@finch.boston.redhat.com> 2:2.0.16-1
 - sync up with current upstream release, 2.0.16, fixes bug #108960
 
@@ -1215,4 +1218,3 @@ rm -rf $RPM_BUILD_ROOT
   - Remove some hacks to support building on all sorts of distributions at
     the cost of specfile readability
   - Remove postdrop group on deletion
-
