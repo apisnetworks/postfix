@@ -44,7 +44,7 @@
 Name: postfix
 Summary: Postfix Mail Transport Agent
 Epoch: 3
-Version: 3.3.4
+Version: 3.5.6
 Release: 1%{?dist}
 Group: System Environment/Daemons
 URL: http://www.postfix.org
@@ -85,7 +85,7 @@ Source102: hide_header_checks
 Patch2: postfix-3.2.3-files.patch
 Patch3: postfix-alternatives.patch
 Patch9: pflogsumm-1.1.3-datecalc.patch
-Patch10: mastercf-apnscp.patch
+Patch10: mastercf-34-apnscp.patch
 
 # Optional patches - set the appropriate environment variables to include
 #		     them when building the package/spec file
@@ -496,6 +496,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755, root, root) %{postfix_daemon_dir}/postscreen
 %attr(0755, root, root) %{postfix_daemon_dir}/proxymap
 %attr(0755, root, root) %{postfix_daemon_dir}/postfix-tls-script
+%attr(0755, root, root) %{postfix_daemon_dir}/postlogd
+
 %{_bindir}/mailq.postfix
 %{_bindir}/newaliases.postfix
 %{_bindir}/rmail.postfix
@@ -532,6 +534,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sat Aug 01 2020 Matt Saladna <matt@apisnetworks.com> - 3:3.5.6-1.apnscp
+- Version bump
+
 * Mon Apr 01 2019 Matt Saladna <matt@apisnetworks.com> - 3:3.3.4-1.apnscp
 - Bump to 3.3.4
 - Remove PAM alternatives usage

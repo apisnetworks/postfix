@@ -1,0 +1,100 @@
+diff -Nur postfix-3.5.4.orig/conf/master.cf postfix-3.5.4/conf/master.cf
+--- postfix-3.5.4.orig/conf/master.cf	2020-07-23 22:37:34.256616463 +0100
++++ postfix-3.5.4/conf/master.cf	2020-07-23 22:42:49.059157670 +0100
+@@ -9,39 +9,24 @@
+ # service type  private unpriv  chroot  wakeup  maxproc command + args
+ #               (yes)   (yes)   (no)    (never) (100)
+ # ==========================================================================
+-smtp      inet  n       -       n       -       -       smtpd
+-#smtp      inet  n       -       n       -       1       postscreen
+-#smtpd     pass  -       -       n       -       -       smtpd
+-#dnsblog   unix  -       -       n       -       0       dnsblog
+-#tlsproxy  unix  -       -       n       -       0       tlsproxy
+-#submission inet n       -       n       -       -       smtpd
+-#  -o syslog_name=postfix/submission
+-#  -o smtpd_tls_security_level=encrypt
+-#  -o smtpd_sasl_auth_enable=yes
+-#  -o smtpd_tls_auth_only=yes
+-#  -o smtpd_reject_unlisted_recipient=no
+-#  -o smtpd_client_restrictions=$mua_client_restrictions
+-#  -o smtpd_helo_restrictions=$mua_helo_restrictions
+-#  -o smtpd_sender_restrictions=$mua_sender_restrictions
+-#  -o smtpd_recipient_restrictions=
+-#  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+-#  -o milter_macro_daemon_name=ORIGINATING
+-#smtps     inet  n       -       n       -       -       smtpd
+-#  -o syslog_name=postfix/smtps
+-#  -o smtpd_tls_wrappermode=yes
+-#  -o smtpd_sasl_auth_enable=yes
+-#  -o smtpd_reject_unlisted_recipient=no
+-#  -o smtpd_client_restrictions=$mua_client_restrictions
+-#  -o smtpd_helo_restrictions=$mua_helo_restrictions
+-#  -o smtpd_sender_restrictions=$mua_sender_restrictions
+-#  -o smtpd_recipient_restrictions=
+-#  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+-#  -o milter_macro_daemon_name=ORIGINATING
+-#628       inet  n       -       n       -       -       qmqpd
++smtp      inet  n       -       n       -       1       postscreen
++	-o smtpd_sasl_auth_enable=yes
++smtpd     pass  -       -       n       -       -       smtpd
++	-o smtpd_sasl_auth_enable=yes
++submission inet n       -       n       -       -       smtpd
++	-o milter_macro_daemon_name=ORIGINATING
++	-o cleanup_service_name=hidesender
++	-o smtpd_tls_security_level=may
++	-o smtpd_sasl_auth_enable=yes
++smtps     inet  n       -       n       -       -       smtpd
++ 	-o cleanup_service_name=hidesender
++ 	-o milter_macro_daemon_name=ORIGINATING
++ 	-o smtpd_enforce_tls=yes
++ 	-o smtpd_tls_wrappermode=yes
++ 	-o smtpd_sasl_auth_enable=yes
+ pickup    unix  n       -       n       60      1       pickup
+ cleanup   unix  n       -       n       -       0       cleanup
+ qmgr      unix  n       -       n       300     1       qmgr
+-#qmgr     unix  n       -       n       300     1       oqmgr
+ tlsmgr    unix  -       -       n       1000?   1       tlsmgr
+ rewrite   unix  -       -       n       -       -       trivial-rewrite
+ bounce    unix  -       -       n       -       0       bounce
+@@ -53,8 +38,16 @@
+ proxywrite unix -       -       n       -       1       proxymap
+ smtp      unix  -       -       n       -       -       smtp
+ relay     unix  -       -       n       -       -       smtp
+-        -o syslog_name=postfix/$service_name
+-#       -o smtp_helo_timeout=5 -o smtp_connect_timeout=5
++	-o smtp_helo_timeout=5 -o smtp_connect_timeout=5
++	-o syslog_name=postfix/$service_name
++relaylim  unix  -       -       n       -       1       smtp
++	-o fallback_relay= -o default_destination_concurrency_limit=1
++	-o smtp_helo_timeout=5 -o smtp_connect_timeout=5
++	-o syslog_name=postfix/$service_name
++oneshot   unix  -       -       n       -       -       smtp
++	-o fallback_relay=[127.0.0.1]:10029
++127.0.0.1:10029 inet n  -       n       -       -       smtpd
++	-o fallback_relay= -o smtpd_client_restrictions=reject
+ showq     unix  n       -       n       -       -       showq
+ error     unix  -       -       n       -       -       error
+ retry     unix  -       -       n       -       -       error
+@@ -65,6 +58,17 @@
+ anvil     unix  -       -       n       -       1       anvil
+ scache    unix  -       -       n       -       1       scache
+ postlog   unix-dgram n  -       n       -       1       postlogd
++dnsblog   unix  -       -       n       -       0       dnsblog
++tlsproxy  unix  -       -       n       -       0       tlsproxy
++hidesender unix n       -       -       -       0       cleanup
++	-o header_checks=regexp:/etc/postfix/hide_header_checks
++vmaildrop  unix  -       n       n       -       20       pipe
++	flags=XODRhu user=mail argv=/usr/bin/maildrop
++	-d ${user}@${nexthop} ${extension} ${recipient} ${user} ${nexthop}
++localmaildrop  unix  -       n       n       -       20       pipe
++	flags=XODRhu user=mail argv=/usr/bin/maildrop
++	-d ${user} ${extension} ${recipient} ${user} ${nexthop}
++
+ #
+ # ====================================================================
+ # Interfaces to non-Postfix software. Be sure to examine the manual
+@@ -131,3 +135,4 @@
+ #mailman   unix  -       n       n       -       -       pipe
+ #  flags=FRX user=list argv=/usr/lib/mailman/bin/postfix-to-mailman.py
+ #  ${nexthop} ${user}
++
