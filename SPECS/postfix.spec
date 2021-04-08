@@ -44,7 +44,7 @@
 Name: postfix
 Summary: Postfix Mail Transport Agent
 Epoch: 3
-Version: 3.5.6
+Version: 3.5.9
 Release: 1%{?dist}
 Group: System Environment/Daemons
 URL: http://www.postfix.org
