@@ -44,7 +44,7 @@
 Name: postfix
 Summary: Postfix Mail Transport Agent
 Epoch: 3
-Version: 3.5.15
+Version: 3.7.4
 Release: 1%{?dist}
 Group: System Environment/Daemons
 URL: http://www.postfix.org
@@ -85,7 +85,7 @@ Source102: hide_header_checks
 Patch2: postfix-3.2.3-files.patch
 Patch3: postfix-alternatives.patch
 Patch9: pflogsumm-1.1.3-datecalc.patch
-Patch10: mastercf-34-apnscp.patch
+Patch10: mastercf-37-apnscp.patch
 
 # Optional patches - set the appropriate environment variables to include
 #		     them when building the package/spec file
@@ -168,8 +168,8 @@ CCARGS="${CCARGS} -fsigned-char"
 %endif
 %if %{with pcre}
   # -I option required for pcre 3.4 (and later?)
-  CCARGS="${CCARGS} -DHAS_PCRE -I%{_includedir}/pcre"
-  AUXLIBS="${AUXLIBS} -lpcre"
+  CCARGS="${CCARGS} -DHAS_PCRE=2 `pcre2-config --cflags`"
+  AUXLIBS="${AUXLIBS} `pcre2-config --libs8`"
 %endif
 %if %{with mysql}
   CCARGS="${CCARGS} -DHAS_MYSQL -I%{_includedir}/mysql"
@@ -200,6 +200,10 @@ CCARGS="${CCARGS} -DUSE_SASL_AUTH -DDEF_SERVER_SASL_TYPE=\\\"dovecot\\\""
 
 CCARGS="${CCARGS} -DDEF_CONFIG_DIR=\\\"%{postfix_config_dir}\\\""
 CCARGS="${CCARGS} $(getconf LFS_CFLAGS)"
+
+%if 0%{?rhel} >= 8
+    CCARGS="${CCARGS} -DNO_NIS"
+%endif
 
 AUXLIBS="${AUXLIBS} %{?harden:%{harden}}"
 
