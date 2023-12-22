@@ -44,7 +44,13 @@
 Name: postfix
 Summary: Postfix Mail Transport Agent
 Epoch: 3
+
+%if 0%{?rhel} < 8
+Version: 3.5.23
+%else
 Version: 3.7.9
+%endif
+
 Release: 1%{?dist}
 Group: System Environment/Daemons
 URL: http://www.postfix.org
@@ -85,8 +91,11 @@ Source102: hide_header_checks
 Patch2: postfix-3.2.3-files.patch
 Patch3: postfix-alternatives.patch
 Patch9: pflogsumm-1.1.3-datecalc.patch
+%if 0%{?rhel} < 8
+Patch10: mastercf-35-apnscp.patch
+%else
 Patch10: mastercf-37-apnscp.patch
-
+%endif
 # Optional patches - set the appropriate environment variables to include
 #		     them when building the package/spec file
 
@@ -95,13 +104,16 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # Determine the different packages required for building postfix
 BuildRequires: libdb-devel, pkgconfig, zlib-devel
 BuildRequires: systemd-units
-
 %{?with_ldap:BuildRequires: openldap-devel}
 %{?with_sasl:BuildRequires: cyrus-sasl-devel}
 %{?with_pcre:BuildRequires: pcre-devel}
 %{?with_mysql:BuildRequires: mysql-devel}
 %{?with_pgsql:BuildRequires: postgresql-devel}
+%if 0%{?rhel} < 8
+%{?with_tls:BuildRequires: openssl11-devel}
+%else
 %{?with_tls:BuildRequires: openssl-devel}
+%endif
 
 %description
 Postfix is a Mail Transport Agent (MTA), supporting LDAP, SMTP AUTH (SASL),
@@ -167,9 +179,15 @@ CCARGS="${CCARGS} -fsigned-char"
   AUXLIBS="${AUXLIBS} -lldap -llber"
 %endif
 %if %{with pcre}
-  # -I option required for pcre 3.4 (and later?)
-  CCARGS="${CCARGS} -DHAS_PCRE=2 `pcre2-config --cflags`"
-  AUXLIBS="${AUXLIBS} `pcre2-config --libs8`"
+  %if %{?rhel} < 8
+    # -I option required for pcre 3.4 (and later?)
+    CCARGS="${CCARGS} -DHAS_PCRE `pcre2-config --cflags`"
+    AUXLIBS="${AUXLIBS} `pcre-config --libs`"
+  %else
+    # -I option required for pcre 3.4 (and later?)
+    CCARGS="${CCARGS} -DHAS_PCRE=2 `pcre2-config --cflags`"
+    AUXLIBS="${AUXLIBS} `pcre2-config --libs8`"
+  %endif
 %endif
 %if %{with mysql}
   CCARGS="${CCARGS} -DHAS_MYSQL -I%{_includedir}/mysql"
@@ -186,14 +204,25 @@ CCARGS="${CCARGS} -fsigned-char"
 %endif
 CCARGS="${CCARGS} -DUSE_SASL_AUTH -DDEF_SERVER_SASL_TYPE=\\\"dovecot\\\""
 %if %{with tls}
-  if pkg-config openssl ; then
-    CCARGS="${CCARGS} -DUSE_TLS `pkg-config --cflags openssl`"
-    AUXLIBS="${AUXLIBS} `pkg-config --libs openssl`"
-  else
-    CCARGS="${CCARGS} -DUSE_TLS -I/usr/include/openssl"
-    AUXLIBS="${AUXLIBS} -lssl -lcrypto"
-  fi
+  %if 0%{?rhel} < 8
+    if pkg-config openssl11 ; then
+      CCARGS="${CCARGS} -DUSE_TLS `pkg-config --cflags openssl11`"
+      AUXLIBS="${AUXLIBS} `pkg-config --libs openssl11`"
+    else
+      CCARGS="${CCARGS} -DUSE_TLS -I/usr/include/openssl11"
+      AUXLIBS="${AUXLIBS} -lssl -lcrypto"
+    fi
+  %else
+    if pkg-config openssl ; then
+      CCARGS="${CCARGS} -DUSE_TLS `pkg-config --cflags openssl`"
+      AUXLIBS="${AUXLIBS} `pkg-config --libs openssl`"
+    else
+      CCARGS="${CCARGS} -DUSE_TLS -I/usr/include/openssl"
+      AUXLIBS="${AUXLIBS} -lssl -lcrypto"
+    fi
+  %endif
 %endif
+
 %if ! %{with ipv6}
   CCARGS="${CCARGS} -DNO_IPV6"
 %endif
