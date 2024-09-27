@@ -48,7 +48,7 @@ Epoch: 3
 %if 0%{?rhel} < 8
 Version: 3.5.23
 %else
-Version: 3.7.9
+Version: 3.7.11
 %endif
 
 Release: 1%{?dist}
