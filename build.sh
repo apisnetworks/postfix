@@ -6,4 +6,4 @@ if [[ ${#MATCHES[@]} -gt 0 ]] ; then
   PGSQL=${MATCHES[$CNT-1]}
   PG_VERSION=${PGSQL##*-}
 fi
-rpmbuild --define 'dist .apnscp' --define "pg_version $PG_VERSION"  --define "_topdir `pwd`" -ba SPECS/postfix.spec
+rpmbuild --define 'dist .apnscp' --with lmdb --define "pg_version $PG_VERSION"  --define "_topdir `pwd`" -ba SPECS/postfix.spec

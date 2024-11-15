@@ -1,4 +1,5 @@
 %bcond_with mysql
+%bcond_with lmdb
 # Dovecot SASL used instead
 %bcond_without sasl
 %bcond_with ldap
@@ -109,6 +110,7 @@ BuildRequires: systemd-units
 %{?with_pcre:BuildRequires: pcre-devel}
 %{?with_mysql:BuildRequires: mysql-devel}
 %{?with_pgsql:BuildRequires: postgresql-devel}
+%{?with_lmdb:BuildRequires: lmdb-devel}
 %if 0%{?rhel} < 8
 %{?with_tls:BuildRequires: openssl11-devel}
 %else
@@ -225,6 +227,11 @@ CCARGS="${CCARGS} -DUSE_SASL_AUTH -DDEF_SERVER_SASL_TYPE=\\\"dovecot\\\""
 
 %if ! %{with ipv6}
   CCARGS="${CCARGS} -DNO_IPV6"
+%endif
+
+%if %{with lmdb}
+  CCARGS="${CCARGS} -DHAS_LMDB"
+  AUXLIBS="${AUXLIBS} -llmdb"
 %endif
 
 CCARGS="${CCARGS} -DDEF_CONFIG_DIR=\\\"%{postfix_config_dir}\\\""
