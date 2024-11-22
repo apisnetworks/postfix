@@ -52,7 +52,7 @@ Version: 3.5.23
 Version: 3.7.11
 %endif
 
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: System Environment/Daemons
 URL: http://www.postfix.org
 License: IBM and GPLv2+
@@ -574,6 +574,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Nov 21 2024 Matt Saladna <matt@apisnetworks.com> - 3:3.7.11-2.apnscp
+- LMDB maps
+- maintenance transport
+
 * Sat Aug 01 2020 Matt Saladna <matt@apisnetworks.com> - 3:3.5.6-1.apnscp
 - Version bump
 
