@@ -48,11 +48,15 @@ Epoch: 3
 
 %if 0%{?rhel} < 8
 Version: 3.5.23
-%else
+Release: 2%{?dist}
+%elif 0%{?rhel} < 10
 Version: 3.7.11
+Release: 2%{?dist}
+%else
+Version: 3.10.3
+Release: 1%{?dist}
 %endif
 
-Release: 2%{?dist}
 Group: System Environment/Daemons
 URL: http://www.postfix.org
 License: IBM and GPLv2+
@@ -94,8 +98,10 @@ Patch3: postfix-alternatives.patch
 Patch9: pflogsumm-1.1.3-datecalc.patch
 %if 0%{?rhel} < 8
 Patch10: mastercf-35-apnscp.patch
-%else
+%elif 0%{?rhel} < 10
 Patch10: mastercf-37-apnscp.patch
+%else
+Patch10: mastercf-310-apnscp.patch
 %endif
 # Optional patches - set the appropriate environment variables to include
 #		     them when building the package/spec file
@@ -107,7 +113,12 @@ BuildRequires: libdb-devel, pkgconfig, zlib-devel
 BuildRequires: systemd-units
 %{?with_ldap:BuildRequires: openldap-devel}
 %{?with_sasl:BuildRequires: cyrus-sasl-devel}
+%if 0%{?rhel} < 9
 %{?with_pcre:BuildRequires: pcre-devel}
+%else
+%{?with_pcre:BuildRequires: pcre2-devel}
+%endif
+
 %{?with_mysql:BuildRequires: mysql-devel}
 %{?with_pgsql:BuildRequires: postgresql-devel}
 %{?with_lmdb:BuildRequires: lmdb-devel}
