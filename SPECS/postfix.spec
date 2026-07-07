@@ -49,11 +49,8 @@ Epoch: 3
 %if 0%{?rhel} < 8
 Version: 3.5.23
 Release: 2%{?dist}
-%elif 0%{?rhel} < 10
-Version: 3.7.11
-Release: 2%{?dist}
 %else
-Version: 3.10.3
+Version: 3.10.12
 Release: 1%{?dist}
 %endif
 
@@ -98,8 +95,6 @@ Patch3: postfix-alternatives.patch
 Patch9: pflogsumm-1.1.3-datecalc.patch
 %if 0%{?rhel} < 8
 Patch10: mastercf-35-apnscp.patch
-%elif 0%{?rhel} < 10
-Patch10: mastercf-37-apnscp.patch
 %else
 Patch10: mastercf-310-apnscp.patch
 %endif
